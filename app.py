@@ -21,7 +21,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', 'your_openai_key_here')
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 openai.api_key = OPENAI_API_KEY
 
-# In-memory storage for call data (use a database in production)
+# In-memory storage for call data
 call_data = {}
 conversations = {}
 
@@ -165,7 +165,7 @@ def process_speech():
     # Check if we have enough information to book
     conversation_length = len(conversations[call_sid])
     
-    if conversation_length >= 6:  # After 3 exchanges, try to wrap up
+    if conversation_length >= 6:
         # Extract booking information
         conversation_text = "\n".join(call_data[call_sid]['conversation'])
         booking_info = extract_booking_info(conversation_text)
@@ -181,10 +181,10 @@ def process_speech():
             language='en-GB'
         )
         
-        # Send SMS confirmation (optional)
+        # Send SMS confirmation
         send_confirmation_sms(call_sid)
         
-        # Save to your dashboard database here
+        # Save to dashboard
         save_to_dashboard(call_sid)
         
         response.hangup()
@@ -235,7 +235,7 @@ def send_confirmation_sms(call_sid):
             print(f"SMS Error: {e}")
 
 def save_to_dashboard(call_sid):
-    """Save call data to your dashboard database"""
+    """Save call data to dashboard"""
     data = call_data.get(call_sid, {})
     booking_info = data.get('booking_info', {})
     
@@ -256,13 +256,7 @@ def save_to_dashboard(call_sid):
         'transcript': '\n'.join(data.get('conversation', []))
     }
     
-    # Here you would save to your actual database
-    # For now, just print it
     print(f"Saving to dashboard: {json.dumps(dashboard_data, indent=2)}")
-    
-    # In production, you'd do something like:
-    # database.save_call(dashboard_data)
-    # or send to your React dashboard API endpoint
 
 @app.route('/api/calls', methods=['GET'])
 def get_calls():
@@ -289,7 +283,6 @@ def health():
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
 if __name__ == '__main__':
-    # Run on port 5000
     print("AI Voice Bot Backend Starting...")
     print("Make sure to set your environment variables:")
     print("  - TWILIO_ACCOUNT_SID")
